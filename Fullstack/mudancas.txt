@@ -1,0 +1,3 @@
+usar collapse para ir mostrando as opcoes
+de pedido, e ao selecionar o cliente ja aparecer os seus pedidos em baixo
+com uma tabela encolhida apenas com a quant de pedidos, media de valor, quant produtos, e a media de rentabilidade, que ao apertar na setinha abre para ver todos, e poder excluyir e alterar eles, com funcao javascript, para mudar no resumo assim que removido ou alterado, com drop, para organizar por coisas do pedido, e paginacao de no maximo 30 unidades por pagina, para nao ficar gigantesca a tabela, e collpse nas outras se abrir outra
