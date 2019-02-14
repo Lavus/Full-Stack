@@ -11,6 +11,7 @@
 var produto = <?php echo json_encode($produto) ?>;
 var backup_inner = "";
 var backup_inner_id = "";
+var alter_order_id = "";
 //~ alert( produto[6]['preco_unitario_produto'] );
 </script>
 <html>
@@ -87,7 +88,10 @@ var backup_inner_id = "";
             <input type="number" step=1 id="amount" required="required" min="1" name="quantidade" value="1">
             <input type="submit" value="Submit">
         </form> 
-        <div id="txtHint">Customer info will be listed here...</div>
+        <form id='altera_pedido'>
+            <div id="txtHint">Customer info will be listed here...</div>
+            <input type="submit" style="visibility:hidden" value="Submit">
+        </form>
         <script>
             function alter_table(int) {
                 if ((backup_inner != "") && (backup_inner_id != "")){
@@ -107,41 +111,31 @@ var backup_inner_id = "";
                 xhttp.send();
             }
             function alter_order(int) {
-                $(document).ready(function(){
-                  $('#altera_pedido').submit(function(ev){
-                    ev.preventDefault();
+                alter_order_id = int;
+            }
+            function exclude_order(int) {
+                if (confirm('Tem certeza que quer excluir este pedido?')) {
+                    //~ alert("yes");
                     var id = "txt"+int;
                     var xhttp;    
                     xhttp = new XMLHttpRequest();
                     xhttp.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
-                            document.getElementById(id).innerHTML = this.responseText;
+                            document.getElementById(id).style.visibility = "collapse";;
+                            alert(this.responseText);
                             backup_inner = "";
                             backup_inner_id = "";
                         }
                     };
                     var pedido = "pedido="+int;
-                    var produto = "produto="+document.getElementById('product'+int).value;
-                    var preco = "preco="+document.getElementById('price'+int).value;
-                    var quantidade = "quantidade="+document.getElementById('amount'+int).value;
-                    alert("alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade);
-                    xhttp.open("GET", "alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade, true);
+                    //~ alert("exclude_order.php?"+pedido);
+                    xhttp.open("GET", "exclude_order.php?"+pedido, true);
                     xhttp.send();
-                  });
-                });
-                if (confirm('Tem certeza que quer alterar este pedido?')) {
-                    alert("yes");
                 } else {
-                    alert("no");
+                    //~ alert("no");
                     return false;
                 }
-            }
-            function exclude_order(int) {
-                if (confirm('Tem certeza que quer excluir este pedido?')) {
-                    alert("yes");
-                } else {
-                    alert("no");
-                }
+
             }
             function showCustomer(int) {
                 var xhttp;    
@@ -184,20 +178,51 @@ var backup_inner_id = "";
                     //~ alert (preco);
                     if ( parseFloat(str) > parseFloat(preco) ){
                         document.getElementById("rentabilidade"+txt).innerHTML = "Ôtima";
+                        document.getElementById("rentabilidade"+txt).style.backgroundColor = "";
                         //~ alert("otimo");
                     }
                     else{
                         if ( parseFloat(str) >= parseFloat(preco*0.9) ){
                             document.getElementById("rentabilidade"+txt).innerHTML = "Boa";
+                            document.getElementById("rentabilidade"+txt).style.backgroundColor = "";
                             //~ alert("bom");
                         }
                         else{
                             document.getElementById("rentabilidade"+txt).innerHTML = "Ruim";
+                            document.getElementById("rentabilidade"+txt).style.backgroundColor = "red";
                             alert("ruim");
                         }
                     }
                 }
             }
+            $("#altera_pedido").submit(function(e){
+                //~ alert(alter_order_id);
+                e.preventDefault();
+                if (confirm('Tem certeza que quer alterar este pedido?')) {
+                    //~ alert("yes");
+                    var id = "txt"+alter_order_id;
+                    var xhttp;    
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById(id).innerHTML = this.responseText;
+                            backup_inner = "";
+                            backup_inner_id = "";
+                        }
+                    };
+                    var pedido = "pedido="+alter_order_id;
+                    var produto = "produto="+document.getElementById('product'+alter_order_id).value;
+                    var preco = "preco="+document.getElementById('price'+alter_order_id).value;
+                    var quantidade = "quantidade="+document.getElementById('amount'+alter_order_id).value;
+                    //~ alert("alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade);
+                    xhttp.open("GET", "alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade, true);
+                    xhttp.send();
+                } else {
+                    alert("no");
+                    return false;
+                }
+
+            });
         </script>
     </body>
 </html>

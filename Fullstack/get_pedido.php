@@ -8,7 +8,6 @@ $stmt->execute();
 $stmt->store_result();
 $stmt->bind_result($id_pedido,$nome_cliente,$nome_produto,$preco_unitario_pedido,$quantidade_pedido,$tempo_pedido,$preco_unitario_produto);
 
-echo "<form id='altera_pedido' action='' method='GET'>";
 echo "<table style='width:100%;'>";
 echo "<tr>";
 echo "<th>ID do pedido</th>";
@@ -41,6 +40,5 @@ while($stmt->fetch()){
     echo("</tbody>");
 }
 echo "</table>";
-echo "</form>";
 $stmt->close();
 ?> 

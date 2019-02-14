@@ -24,6 +24,41 @@ CREATE TABLE IF NOT EXISTS `pedido` (
   CONSTRAINT fk_cliente_pedido FOREIGN KEY (id_cliente_pedido) REFERENCES clientes (id_cliente)
 );
 
+DELIMITER $$
+CREATE TRIGGER validate_insert_pedido
+BEFORE INSERT ON pedido
+FOR EACH ROW 
+BEGIN
+    DECLARE preco_produto Float;
+    DECLARE quantidade_produto INT;
+    SET preco_produto = (SELECT produtos.preco_unitario_produto FROM produtos WHERE produtos.id_produto = NEW.id_produto_pedido);
+    SET quantidade_produto = (SELECT produtos.multiplo_produto FROM produtos WHERE produtos.id_produto = NEW.id_produto_pedido);
+    IF (NEW.preco_unitario_pedido < (preco_produto*0.9)) THEN
+        SET NEW.preco_unitario_pedido = NULL;
+    END IF;
+    IF ((SELECT MOD(NEW.quantidade_pedido, quantidade_produto)) != 0) THEN
+        SET NEW.quantidade_pedido = NULL;
+    END IF;
+END$$
+DELIMITER;
+
+DELIMITER $$
+CREATE TRIGGER validate_update_pedido
+BEFORE UPDATE ON pedido
+FOR EACH ROW 
+BEGIN
+    DECLARE preco_produto Float;
+    DECLARE quantidade_produto INT;
+    SET preco_produto = (SELECT produtos.preco_unitario_produto FROM produtos WHERE produtos.id_produto = NEW.id_produto_pedido);
+    SET quantidade_produto = (SELECT produtos.multiplo_produto FROM produtos WHERE produtos.id_produto = NEW.id_produto_pedido);
+    IF (NEW.preco_unitario_pedido < (preco_produto*0.9)) THEN
+        SET NEW.preco_unitario_pedido = NULL;
+    END IF;
+    IF ((SELECT MOD(NEW.quantidade_pedido, quantidade_produto)) != 0) THEN
+        SET NEW.quantidade_pedido = NULL;
+    END IF;
+END$$
+DELIMITER;
 
 INSERT INTO `clientes` (`id_cliente`, `nome_cliente`) VALUES (1, 'Darth Vader'), (2, 'Obi-Wan Kenobi'), (3, 'Luke Skywalker'), (4, 'Imperador Palpatine'), (5, 'Han Solo');
 INSERT INTO `produtos` (`id_produto`, `nome_produto`, `preco_unitario_produto`, `multiplo_produto`) VALUES (1, 'Millenium Falcon', 550000.00, 1), (2, 'X-Wing', 60000.00, 2), (3, 'Super Star Destroyer', 4570000.00, 1), (4, 'TIE Fighter', 75000.00, 2), (5, 'Lightsaber', 6000.00, 5), (6, 'DLT-19 Heavy Blaster ifle', 5800.00, 1), (7, 'DL-44 Heavy Blaster Pistol', 1500.00, 10);
