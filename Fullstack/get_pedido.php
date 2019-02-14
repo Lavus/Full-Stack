@@ -17,6 +17,8 @@ echo "<th>Preço unitario do pedido</th>";
 echo "<th>Rentabilidade do pedido</th>";
 echo "<th>Quantidade de produtos pedido</th>";
 echo "<th>Tempo de realização do pedido</th>";
+echo "<th>Alterar o pedido</th>";
+echo "<th>Deletar o pedido</th>";
 echo "</tr>";
 while($stmt->fetch()){
     echo("<tbody id='txt" . $id_pedido. "'>");

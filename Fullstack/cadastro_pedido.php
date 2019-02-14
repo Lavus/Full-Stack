@@ -8,10 +8,4 @@ $stmt->bind_param("iidi", $_GET['cliente'],$_GET['produto'],$_GET['preco'],$_GET
 $stmt->execute();
 $stmt->close();
 
-echo "<table>";
-echo "<tr>";
-echo "<th>CustomerID</th>";
-echo "<th>CompanyName</th>";
-echo "</tr>";
-echo "</table>";
 ?> 

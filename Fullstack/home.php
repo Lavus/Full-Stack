@@ -18,13 +18,27 @@ var alter_order_id = "";
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <style>
+            table, td, th {
+                border: 1px solid black;
+            }
+            td {
+                text-align:center;
+            }
+        </style>
         <script>
         $(document).ready(function(){
           $('#cadastro_pedido').submit(function(ev){
+            //~ alert(document.getElementById("rentabilidade").style.backgroundColor);
+            if (document.getElementById("rentabilidade").style.backgroundColor == 'red'){
+                alert("Não é permitido cadastrar pedidos com a rentabilidade ruim \n por favor aumente o preço se deseja cadastrar o pedido");
+                document.getElementById("price").focus();
+                return false;
+            }
             ev.preventDefault();
-            alert("Submitted");
+            //~ alert("Submitted");
             var dados = $('#cadastro_pedido').serialize();
-            alert(dados);
+            //~ alert(dados);
             
             var xhttp;    
             if (dados == "") {
@@ -37,7 +51,6 @@ var alter_order_id = "";
                     document.getElementById("txtHint").innerHTML = this.responseText;
                 }
             };
-            alert("aaa");
             xhttp.open("GET", "cadastro_pedido.php?"+dados, true);
             xhttp.send();
           });
@@ -46,50 +59,58 @@ var alter_order_id = "";
         <title>Full Stack</title>
     </head>
     <body>
-        <table style="width:100%;">
-            <tr>
-                <th style="width:33%;">Firstname</th>
-                <th style="width:34%;">Lastname</th>
-                <th style="width:33%;">Age</th>
-            </tr>
-            <tr>
-                <td>Jill</td>
-                <td>Rentabilidade</td>
-                <td>50</td>
-            </tr>
-            <tr>
-                <td style="visibility:collapse;">Eve</td>
-                <td><div id="rentabilidade">Rentabilidade do pedido serás mostrado aqui ...</div></td>
-                <td style="visibility:collapse;">94</td>
-            </tr>
-        </table> 
         <form id="cadastro_pedido" action="" method="GET">
-            <select name='cliente' required="required" onchange="showCustomer(this.value)">
-                <option value="">Selecione um cliente:</option>
-                <?php
-                    for ($contador = 0; $contador < count($cliente); $contador++) {
-                        printf ("<option value='%d'>%s</option>", $cliente[$contador]['id_cliente'], $cliente[$contador]['nome_cliente']);
-                    }
-                ?>
-            </select> 
-            <select id='product' name='produto' required="required" onchange="showprice(this.value,'')">
-                <option value="">Selecione um produto:</option>
-                <?php
-                    $contador = 0;
-                    while( $contador < count($produto)){
-                        printf ("<option value='%d'>%s</option>", $produto[$contador]["id_produto"], $produto[$contador]["nome_produto"]);
-                        $contador++;
-                    }
-                ?>
-            </select> 
-            Preço Unitario:
-            <input id="price" required="required" type="number" step=0.01 name="preco" min="0.01" value="0.01" onkeyup="showrentability(this.value,'')" onchange="showrentability(this.value,'')">
-            Quantidade:
-            <input type="number" step=1 id="amount" required="required" min="1" name="quantidade" value="1">
-            <input type="submit" value="Submit">
+            <table style="width:100%;">
+                <tr>
+                    <th>Nome do cliente</th>
+                    <th>Nome do produto</th>
+                    <th>Preço unitario</th>
+                    <th>Rentabilidade do pedido</th>
+                    <th>Quantidade de produtos</th>
+                    <th>Concluir pedido</th>
+                </tr>
+                <tr>
+                    <td>                    
+                        <select name='cliente' required="required" onchange="showCustomer(this.value)">
+                            <option value="">Selecione um cliente:</option>
+                            <?php
+                                for ($contador = 0; $contador < count($cliente); $contador++) {
+                                    printf ("<option value='%d'>%s</option>", $cliente[$contador]['id_cliente'], $cliente[$contador]['nome_cliente']);
+                                }
+                            ?>
+                        </select> 
+                    </td>
+                    <td>
+                        <select id='product' name='produto' required="required" onchange="showprice(this.value,'')">
+                            <option value="">Selecione um produto:</option>
+                            <?php
+                                $contador = 0;
+                                while( $contador < count($produto)){
+                                    printf ("<option value='%d'>%s</option>", $produto[$contador]["id_produto"], $produto[$contador]["nome_produto"]);
+                                    $contador++;
+                                }
+                            ?>
+                        </select> 
+                    </td>
+                    <td>
+                        <input id="price" required="required" type="number" step=0.01 name="preco" min="0.01" value="0.01" onkeyup="showrentability(this.value,'')" onchange="showrentability(this.value,'')">
+                    </td>
+                    <td>
+                        <div id="rentabilidade">
+                            Rentabilidade ...
+                        </div>
+                    </td>
+                    <td>
+                        <input type="number" step=1 id="amount" required="required" min="1" name="quantidade" value="1">
+                    </td>
+                    <td>
+                        <input type="submit" value="Submit">
+                    </td>
+                </tr>
+            </table> 
         </form> 
         <form id='altera_pedido'>
-            <div id="txtHint">Customer info will be listed here...</div>
+            <div id="txtHint">Informações dos pedidos do cliente selecionado serão mostradas aqui ...</div>
             <input type="submit" style="visibility:hidden" value="Submit">
         </form>
         <script>
@@ -190,12 +211,18 @@ var alter_order_id = "";
                         else{
                             document.getElementById("rentabilidade"+txt).innerHTML = "Ruim";
                             document.getElementById("rentabilidade"+txt).style.backgroundColor = "red";
-                            alert("ruim");
+                            //~ alert(document.getElementById("rentabilidade"+txt).style.backgroundColor);
+                            //~ alert("ruim");
                         }
                     }
                 }
             }
             $("#altera_pedido").submit(function(e){
+                if (document.getElementById("rentabilidade"+alter_order_id).style.backgroundColor == 'red'){
+                    alert("Não é permitido atualizar pedidos se a rentabilidade estiver ruim \n por favor aumente o preço se deseja atualizar o pedido");
+                    document.getElementById("price"+alter_order_id).focus();
+                    return false;
+                }
                 //~ alert(alter_order_id);
                 e.preventDefault();
                 if (confirm('Tem certeza que quer alterar este pedido?')) {
@@ -218,7 +245,7 @@ var alter_order_id = "";
                     xhttp.open("GET", "alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade, true);
                     xhttp.send();
                 } else {
-                    alert("no");
+                    //~ alert("no");
                     return false;
                 }
 
