@@ -9,6 +9,8 @@
 ?>
 <script type="text/javascript">
 var produto = <?php echo json_encode($produto) ?>;
+var backup_inner = "";
+var backup_inner_id = "";
 //~ alert( produto[6]['preco_unitario_produto'] );
 </script>
 <html>
@@ -17,7 +19,7 @@ var produto = <?php echo json_encode($produto) ?>;
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script>
         $(document).ready(function(){
-          $("form").submit(function(ev){
+          $('#cadastro_pedido').submit(function(ev){
             ev.preventDefault();
             alert("Submitted");
             var dados = $('#cadastro_pedido').serialize();
@@ -34,12 +36,9 @@ var produto = <?php echo json_encode($produto) ?>;
                     document.getElementById("txtHint").innerHTML = this.responseText;
                 }
             };
+            alert("aaa");
             xhttp.open("GET", "cadastro_pedido.php?"+dados, true);
             xhttp.send();
-            
-            
-            
-            
           });
         });
         </script>
@@ -64,7 +63,7 @@ var produto = <?php echo json_encode($produto) ?>;
             </tr>
         </table> 
         <form id="cadastro_pedido" action="" method="GET">
-            <select name='cliente' onchange="showCustomer(this.value)">
+            <select name='cliente' required="required" onchange="showCustomer(this.value)">
                 <option value="">Selecione um cliente:</option>
                 <?php
                     for ($contador = 0; $contador < count($cliente); $contador++) {
@@ -72,7 +71,7 @@ var produto = <?php echo json_encode($produto) ?>;
                     }
                 ?>
             </select> 
-            <select id='product' name='produto' onchange="showprice(this.value)">
+            <select id='product' name='produto' required="required" onchange="showprice(this.value,'')">
                 <option value="">Selecione um produto:</option>
                 <?php
                     $contador = 0;
@@ -83,13 +82,67 @@ var produto = <?php echo json_encode($produto) ?>;
                 ?>
             </select> 
             Preço Unitario:
-            <input id="price" type="number" step=0.01 name="preco" value="" onkeyup="showrentability(this.value)" onchange="showrentability(this.value)">
+            <input id="price" required="required" type="number" step=0.01 name="preco" min="0.01" value="0.01" onkeyup="showrentability(this.value,'')" onchange="showrentability(this.value,'')">
             Quantidade:
-            <input type="number" name="quantidade" value="">
+            <input type="number" step=1 id="amount" required="required" min="1" name="quantidade" value="1">
             <input type="submit" value="Submit">
         </form> 
         <div id="txtHint">Customer info will be listed here...</div>
         <script>
+            function alter_table(int) {
+                if ((backup_inner != "") && (backup_inner_id != "")){
+                    document.getElementById(backup_inner_id).innerHTML = backup_inner;
+                }
+                var id = "txt"+int;
+                backup_inner_id = id;
+                backup_inner = document.getElementById(id).innerHTML;
+                var xhttp;
+                xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById(id).innerHTML = this.responseText;
+                    }
+                };
+                xhttp.open("GET", "change_table.php?pedido="+int, true);
+                xhttp.send();
+            }
+            function alter_order(int) {
+                $(document).ready(function(){
+                  $('#altera_pedido').submit(function(ev){
+                    ev.preventDefault();
+                    var id = "txt"+int;
+                    var xhttp;    
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById(id).innerHTML = this.responseText;
+                            backup_inner = "";
+                            backup_inner_id = "";
+                        }
+                    };
+                    var pedido = "pedido="+int;
+                    var produto = "produto="+document.getElementById('product'+int).value;
+                    var preco = "preco="+document.getElementById('price'+int).value;
+                    var quantidade = "quantidade="+document.getElementById('amount'+int).value;
+                    alert("alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade);
+                    xhttp.open("GET", "alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade, true);
+                    xhttp.send();
+                  });
+                });
+                if (confirm('Tem certeza que quer alterar este pedido?')) {
+                    alert("yes");
+                } else {
+                    alert("no");
+                    return false;
+                }
+            }
+            function exclude_order(int) {
+                if (confirm('Tem certeza que quer excluir este pedido?')) {
+                    alert("yes");
+                } else {
+                    alert("no");
+                }
+            }
             function showCustomer(int) {
                 var xhttp;    
                 if (int == "") {
@@ -100,40 +153,47 @@ var produto = <?php echo json_encode($produto) ?>;
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         document.getElementById("txtHint").innerHTML = this.responseText;
+                        backup_inner = "";
+                        backup_inner_id = "";
                     }
                 };
                 xhttp.open("GET", "get_pedido.php?cliente="+int, true);
                 xhttp.send();
             }
-            function showprice(int) {
+            function showprice(int,txt) {
                 int = int-1
+                //~ alert(txt);
                 //~ alert(produto[int]['preco_unitario_produto']);
                 //~ alert($('#price').val());
-                document.getElementById("price").value = (produto[int]['preco_unitario_produto']*1.01);
-                showrentability(document.getElementById("price").value)
+                document.getElementById("price"+txt).value = (produto[int]['preco_unitario_produto']*1.01);
+                document.getElementById("amount"+txt).value = (produto[int]['multiplo_produto']);
+                document.getElementById("amount"+txt).step = (produto[int]['multiplo_produto']);
+                document.getElementById("amount"+txt).min = (produto[int]['multiplo_produto']);
+                showrentability(document.getElementById("price"+txt).value,txt)
             }
-            function showrentability(str) {
+            function showrentability(str,txt) {
+                //~ alert(txt);
                 if (str.length == 0) {
-                    document.getElementById("rentabilidade").innerHTML = "Rentabilidade do pedido serás mostrado aqui ...";
+                    document.getElementById("rentabilidade"+txt).innerHTML = "Rentabilidade do pedido serás mostrado aqui ...";
                     return;
                 }
                 else {
                     //~ alert (str);
-                    var index_produto = (document.getElementById("product").value)-1;
+                    var index_produto = (document.getElementById("product"+txt).value)-1;
                     var preco = produto[index_produto]['preco_unitario_produto'];
                     //~ alert (preco);
                     if ( parseFloat(str) > parseFloat(preco) ){
-                        document.getElementById("rentabilidade").innerHTML = "Rentabilidade ôtima";
+                        document.getElementById("rentabilidade"+txt).innerHTML = "Ôtima";
                         //~ alert("otimo");
                     }
                     else{
                         if ( parseFloat(str) >= parseFloat(preco*0.9) ){
-                            document.getElementById("rentabilidade").innerHTML = "Rentabilidade boa";
+                            document.getElementById("rentabilidade"+txt).innerHTML = "Boa";
                             //~ alert("bom");
                         }
                         else{
-                            document.getElementById("rentabilidade").innerHTML = "Rentabilidade ruim";
-                            //~ alert("ruim");
+                            document.getElementById("rentabilidade"+txt).innerHTML = "Ruim";
+                            alert("ruim");
                         }
                     }
                 }
