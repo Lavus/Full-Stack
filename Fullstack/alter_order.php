@@ -44,11 +44,11 @@
     echo "<tr>";
         echo "<td>" . $id_pedido. "</td>";
         echo "<td>" . $nome_cliente. "</td>";
-        echo "<td>" . $produto[$_GET['produto']]['nome_produto']. "</td>";
+        echo "<td>" . $produto[$_GET['produto']-1]['nome_produto']. "</td>";
         echo "<td>" . $_GET['preco']. "</td>";
-        if ($_GET['preco'] > $produto[$_GET['produto']]['preco_unitario_produto']){
+        if ($_GET['preco'] > $produto[$_GET['produto']-1]['preco_unitario_produto']){
             echo "<td>Ôtima</td>";
-        }elseif($_GET['preco'] >= $produto[$_GET['produto']]['preco_unitario_produto']*0.9){
+        }elseif($_GET['preco'] >= $produto[$_GET['produto']-1]['preco_unitario_produto']*0.9){
             echo "<td>Boa</td>";
         }else{
             echo "<td>Ruim? Como?</td>";
