@@ -11,11 +11,122 @@
 var produto = <?php echo json_encode($produto) ?>;
 var backup_inner = "";
 var backup_inner_id = "";
-var alter_order_id = "";
+var order_id = "";
+var type_change = "";
 //~ alert( produto[6]['preco_unitario_produto'] );
 </script>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {font-family: Arial, Helvetica, sans-serif;}
+			.pagination {
+			  display: inline-block;
+			  margin: 5px;
+			}
+			.pagination a {
+			  color: black;
+			  float: left;
+			  padding: 8px 16px;
+			  text-decoration: none;
+			}
+
+			.pagination a.active {
+			  background-color: #4CAF50;
+			  color: white;
+			  border-radius: 5px;
+			}
+
+			.pagination a:hover:not(.active) {
+			  background-color: #ddd;
+			  border-radius: 5px;
+			}
+            /* The Modal (background) */
+            .modal {
+			  text-align:center;
+              display: none; /* Hidden by default */
+              position: fixed; /* Stay in place */
+              z-index: 1; /* Sit on top */
+              padding-top: 100px; /* Location of the box */
+              left: 0;
+              top: 0;
+              width: 100%; /* Full width */
+              height: 100%; /* Full height */
+              overflow: auto; /* Enable scroll if needed */
+              background-color: rgb(0,0,0); /* Fallback color */
+              background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+
+            /* Modal Content */
+            .modal-content {
+              position: relative;
+              background-color: #fefefe;
+              margin: auto;
+              padding: 0;
+              border: 1px solid #888;
+              width: 50%;
+              box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+              -webkit-animation-name: animatetop;
+              -webkit-animation-duration: 0.4s;
+              animation-name: animatetop;
+              animation-duration: 0.4s
+            }
+
+            /* Add Animation */
+            @-webkit-keyframes animatetop {
+              from {top:-300px; opacity:0} 
+              to {top:0; opacity:1}
+            }
+
+            @keyframes animatetop {
+              from {top:-300px; opacity:0}
+              to {top:0; opacity:1}
+            }
+
+            /* The Close Button */
+            .close {
+              color: white;
+              float: right;
+              font-size: 28px;
+              font-weight: bold;
+            }
+
+            .close:hover,
+            .close:focus {
+              color: #000;
+              text-decoration: none;
+              cursor: pointer;
+            }
+
+            .modal-header {
+              padding: 2px 16px;
+              background-color: #5cb85c;
+              color: white;
+            }
+
+            .modal-body {padding: 2px 16px;}
+
+            .modal-footer {
+              padding: 2px 16px;
+              background-color: #5cb85c;
+              color: white;
+            }
+            .modal-footer input {
+              margin: 10px;
+			  background-color: #e7e7e7; /* Gray */
+			  border: none;
+			  color: black;
+			  padding: 15px 32px;
+			  text-align: center;
+			  text-decoration: none;
+			  display: inline-block;
+			  border-radius: 12px;
+			  border: 2px solid #e7e7e7;
+			  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+			  font-size: 16px;
+            }
+        </style>
+
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <style>
@@ -30,11 +141,9 @@ var alter_order_id = "";
         $(document).ready(function(){
           $('#cadastro_pedido').submit(function(ev){
             //~ alert(document.getElementById("rentabilidade").style.backgroundColor);
-            if (document.getElementById("rentabilidade").style.backgroundColor == 'red'){
-                alert("Não é permitido cadastrar pedidos com a rentabilidade ruim \n por favor aumente o preço se deseja cadastrar o pedido");
-                document.getElementById("price").focus();
-                return false;
-            }
+			if (verify_profitability("") == false){
+				return false;
+			}
             ev.preventDefault();
             //~ alert("Submitted");
             var dados = $('#cadastro_pedido').serialize();
@@ -42,18 +151,22 @@ var alter_order_id = "";
             
             var xhttp;    
             if (dados == "") {
-                document.getElementById("txtHint").innerHTML = "";
                 return;
             }
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById("txtHint").innerHTML = this.responseText;
+                    showCustomer(document.getElementById("cliente").value,0)
+					document.getElementById("modal_title_check").innerHTML = "Cadastro Pedido";
+					document.getElementById("modal_body_check").innerHTML = "<p>O cadastro do pedido foi realizado com sucesso</p><p>obrigado por utilizar nossos serviços.</p>";
+					document.getElementById("modal_footer_check").style.visibility = "hidden";
+					modal.style.display = "block";
                 }
             };
             xhttp.open("GET", "cadastro_pedido.php?"+dados, true);
             xhttp.send();
           });
+          return false;
         });
         </script>
         <title>Full Stack</title>
@@ -71,7 +184,7 @@ var alter_order_id = "";
                 </tr>
                 <tr>
                     <td>                    
-                        <select name='cliente' required="required" onchange="showCustomer(this.value)">
+                        <select id="cliente" name='cliente' required="required" onchange="showCustomer(this.value,0)">
                             <option value="">Selecione um cliente:</option>
                             <?php
                                 for ($contador = 0; $contador < count($cliente); $contador++) {
@@ -109,6 +222,44 @@ var alter_order_id = "";
                 </tr>
             </table> 
         </form> 
+        <H1>preço total do pedido</H1>
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+
+          <!-- Modal content -->
+          <div class="modal-content">
+            <div class="modal-header">
+              <span class="close">&times;</span>
+              <h2 id="modal_title_check">Modal Header</h2>
+            </div>
+            <div class="modal-body" id="modal_body_check">
+              <p>Some text in the Modal Body</p>
+              <p>Some other text...</p>
+            </div>
+            <div class="modal-footer" id="modal_footer_check">
+              <h3>Modal Footer</h3>
+            </div>
+          </div>
+
+        </div>
+		<a href='#' style="visibility:hidden"></a>
+        <script>
+        // Get the modal
+        var modal = document.getElementById('myModal');
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          close_modal()
+        }
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            close_modal()
+          }
+        }
+        </script>
+
         <form id='altera_pedido'>
             <div id="txtHint">Informações dos pedidos do cliente selecionado serão mostradas aqui ...</div>
             <input type="submit" style="visibility:hidden" value="Submit">
@@ -132,33 +283,133 @@ var alter_order_id = "";
                 xhttp.send();
             }
             function alter_order(int) {
-                alter_order_id = int;
+                order_id = int;
+                type_change = "alter";
+                document.getElementById("modal_title_check").innerHTML = "Alteração de pedido";
+                document.getElementById("modal_body_check").innerHTML = "<p>Tem certeza que quer alterar este pedido?</p><p></p>";
+				document.getElementById("modal_footer_check").style.visibility = "visible";
+                document.getElementById("modal_footer_check").innerHTML = "<input type='button' value='Sim' onclick='confirmed()'><input type='button' value='Não' onclick='close_modal()'>";
+                modal.style.display = "block";
             }
-            function exclude_order(int) {
-                if (confirm('Tem certeza que quer excluir este pedido?')) {
-                    //~ alert("yes");
-                    var id = "txt"+int;
-                    var xhttp;    
-                    xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                            document.getElementById(id).style.visibility = "collapse";;
-                            alert(this.responseText);
-                            backup_inner = "";
-                            backup_inner_id = "";
-                        }
-                    };
-                    var pedido = "pedido="+int;
-                    //~ alert("exclude_order.php?"+pedido);
-                    xhttp.open("GET", "exclude_order.php?"+pedido, true);
-                    xhttp.send();
-                } else {
-                    //~ alert("no");
-                    return false;
+            function verify_profitability(int){
+				if (document.getElementById("rentabilidade"+int).style.backgroundColor == 'red'){
+					document.getElementById("modal_title_check").innerHTML = "Rentabilidade Ruim";
+					document.getElementById("modal_body_check").innerHTML = "<p>Não é permitido atualizar pedidos se a rentabilidade estiver RUIM</p><p>por favor aumente o preço se deseja atualizar o pedido</p>";
+					document.getElementById("modal_footer_check").style.visibility = "hidden";
+					modal.style.display = "block";
+					type_change = "verify";
+					order_id = "price"+int;
+					return false;
+                }else{
+					return true;
+				}
+			}
+            function confirmed_alter_order(int){
+                if (verify_profitability(int) == false){
+					return false;
                 }
+				var id = "txt"+int;
+				var xhttp;    
+				xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						document.getElementById(id).innerHTML = this.responseText;
+						backup_inner = "";
+						backup_inner_id = "";
+					}
+				};
+				var pedido = "pedido="+int;
+				var produto = "produto="+document.getElementById('product'+int).value;
+				var preco = "preco="+document.getElementById('price'+int).value;
+				var quantidade = "quantidade="+document.getElementById('amount'+int).value;
+				xhttp.open("GET", "alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade, true);
+				xhttp.send();
+				close_modal()
+			}
 
+            function confirmed() {
+				if (type_change == "exclude"){
+					confirmed_exclude_order(order_id)
+				}else{
+					 if (type_change == "alter"){
+						 confirmed_alter_order(order_id)
+					 }else{
+						return false;
+					 }
+				}
+			}
+			
+            function close_modal() {
+				if (type_change == "verify"){
+					document.getElementById(order_id).focus();
+				}
+				order_id = "";
+                type_change = "";
+				modal.style.display = "none";
+			}
+			
+            function get_page(int) {
+				var page_id = int.substr(10);
+				//~ alert (page_id);
+				//~ alert(document.getElementById("pagination"+page_id).className);
+				if ((document.getElementById("pagination"+page_id).className == "disabled") || (document.getElementById("pagination"+page_id).className == "active")) {
+					return false;
+				}
+				if (page_id == "next"){
+					//~ alert (page_id);
+					var id = document.getElementsByClassName("active")[0].id; 
+					//~ alert (id);
+					id = id.substr(10);
+					//~ alert (id);
+					id = parseInt(id) + 1;
+					//~ alert (id);
+					page_id = id;
+					//~ alert (page_id);
+				}else{
+					if (page_id == "prev"){
+						//~ alert (page_id);
+						var id = document.getElementsByClassName("active")[0].id;
+						//~ alert (id);
+						id = id.substr(10);
+						id = parseInt(id) - 1;
+						page_id = id;
+					}
+				}
+				//~ alert (page_id);
+				page_id = (page_id - 1)*10
+				//~ alert (page_id);
+			    showCustomer(document.getElementById("cliente").value,page_id)
+			}
+            function exclude_order(int) {
+                order_id = int;
+                type_change = "exclude";
+				document.getElementById("modal_title_check").innerHTML = "Exclusão de pedido";
+				document.getElementById("modal_body_check").innerHTML = "<p>Tem certeza que quer excluir este pedido?</p><p></p>";
+				document.getElementById("modal_footer_check").style.visibility = "visible";
+				document.getElementById("modal_footer_check").innerHTML = "<input type='button' value='Sim' onclick='confirmed()'><input type='button' value='Não' onclick='close_modal()'>";
+                modal.style.display = "block";
+			}
+			function confirmed_exclude_order(int){
+				var id = "txt"+int;
+				var xhttp;    
+				xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						document.getElementById(id).style.visibility = "collapse";
+						document.getElementById("modal_title_check").innerHTML = "Exclusão de pedido";
+						document.getElementById("modal_body_check").innerHTML = "<p>"+this.responseText+"</p>";
+						document.getElementById("modal_footer_check").style.visibility = "hidden";
+						modal.style.display = "block";
+						backup_inner = "";
+						backup_inner_id = "";
+					}
+				};
+				var pedido = "pedido="+int;
+				xhttp.open("GET", "exclude_order.php?"+pedido, true);
+				xhttp.send();
+				close_modal()
             }
-            function showCustomer(int) {
+            function showCustomer(int,int_offset) {
                 var xhttp;    
                 if (int == "") {
                     document.getElementById("txtHint").innerHTML = "";
@@ -172,7 +423,7 @@ var alter_order_id = "";
                         backup_inner_id = "";
                     }
                 };
-                xhttp.open("GET", "get_pedido.php?cliente="+int, true);
+                xhttp.open("GET", "get_pedido.php?cliente="+int+"&offset="+int_offset, true);
                 xhttp.send();
             }
             function showprice(int,txt) {
@@ -218,37 +469,8 @@ var alter_order_id = "";
                 }
             }
             $("#altera_pedido").submit(function(e){
-                if (document.getElementById("rentabilidade"+alter_order_id).style.backgroundColor == 'red'){
-                    alert("Não é permitido atualizar pedidos se a rentabilidade estiver ruim \n por favor aumente o preço se deseja atualizar o pedido");
-                    document.getElementById("price"+alter_order_id).focus();
-                    return false;
-                }
-                //~ alert(alter_order_id);
                 e.preventDefault();
-                if (confirm('Tem certeza que quer alterar este pedido?')) {
-                    //~ alert("yes");
-                    var id = "txt"+alter_order_id;
-                    var xhttp;    
-                    xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function() {
-                        if (this.readyState == 4 && this.status == 200) {
-                            document.getElementById(id).innerHTML = this.responseText;
-                            backup_inner = "";
-                            backup_inner_id = "";
-                        }
-                    };
-                    var pedido = "pedido="+alter_order_id;
-                    var produto = "produto="+document.getElementById('product'+alter_order_id).value;
-                    var preco = "preco="+document.getElementById('price'+alter_order_id).value;
-                    var quantidade = "quantidade="+document.getElementById('amount'+alter_order_id).value;
-                    //~ alert("alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade);
-                    xhttp.open("GET", "alter_order.php?"+pedido+"&"+produto+"&"+preco+"&"+quantidade, true);
-                    xhttp.send();
-                } else {
-                    //~ alert("no");
-                    return false;
-                }
-
+                return false;
             });
         </script>
     </body>
