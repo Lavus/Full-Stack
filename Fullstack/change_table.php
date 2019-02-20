@@ -13,9 +13,9 @@ $stmt->bind_result($id_pedido,$id_produto_pedido,$nome_cliente,$nome_produto,$pr
 $stmt->fetch();
 $stmt->close();
 echo "<tr>";
-    echo "<td>" . $id_pedido. "</td>";
-    echo "<td>" . $nome_cliente. "</td>";
-    echo "<td>";
+    echo "<td data-label='ID do pedido'>" . $id_pedido. "</td>";
+    echo "<td data-label='Nome do cliente'>" . $nome_cliente. "</td>";
+    echo "<td data-label='Nome do produto'>";
         echo "<select id='product".$id_pedido."' name='produto' required='required' onchange='showprice(this.value,".$id_pedido.")' >";
             $contador = 0;
             while( $contador < count($produto)){
@@ -30,18 +30,19 @@ echo "<tr>";
             }
         echo "</select>";
     echo "</td>";
-    echo "<td><input id='price".$id_pedido."' required='required' type='number' step=0.01 name='preco' min='0.01' value='".$preco_unitario_pedido."' onkeyup='showrentability(this.value,".$id_pedido.")' onchange='showrentability(this.value,".$id_pedido.")'></td>";
+    echo "<td data-label='Preço unitario do pedido'><input id='price".$id_pedido."' required='required' type='number' step=0.01 name='preco' min='0.01' value='".$preco_unitario_pedido."' onkeyup='showrentability(this.value,".$id_pedido.")' onchange='showrentability(this.value,".$id_pedido.")'></td>";
     if ($preco_unitario_pedido > $produto[$selected]["preco_unitario_produto"]){
-        echo "<td id='rentabilidade".$id_pedido."'>Ôtima</td>";
+        echo "<td data-label='Rentabilidade do pedido' id='rentabilidade".$id_pedido."'>Ôtima</td>";
     }elseif($preco_unitario_pedido >= $produto[$selected]["preco_unitario_produto"]*0.9){
-        echo "<td id='rentabilidade".$id_pedido."'>Boa</td>";
+        echo "<td data-label='Rentabilidade do pedido' id='rentabilidade".$id_pedido."'>Boa</td>";
     }else{
-        echo "<td id='rentabilidade".$id_pedido."'>Ruim? Como?</td>";
+        echo "<td data-label='Rentabilidade do pedido' id='rentabilidade".$id_pedido."'>Ruim? Como?</td>";
     }
 
-    echo "<td><input id='amount".$id_pedido."' required='required' type='number' step=".$produto[$selected]["multiplo_produto"]." name='quantidade' min='".$produto[$selected]["multiplo_produto"]."' value='" .$quantidade_pedido. "'></td>";
-    echo "<td>" . $tempo_pedido. "</td>";
-    echo "<td><input id='".$id_pedido."' type='submit' onclick='alter_order(this.id)' value='Alterar pedido'></td>";
-    echo "<td><input id='".$id_pedido."' type='button' onclick='exclude_order(this.id)' value='Excluir pedido'></td>";
+    echo "<td data-label='Quantidade de produtos pedido'><input id='amount".$id_pedido."' required='required' type='number' step=".$produto[$selected]["multiplo_produto"]." name='quantidade' min='".$produto[$selected]["multiplo_produto"]."' value='" .$quantidade_pedido. "' onkeyup='verify_total(".$id_pedido.")' onchange='verify_total(".$id_pedido.")'></td>";
+    echo "<td data-label='Preço total do pedido' id='total_price".$id_pedido."'>" . $quantidade_pedido*$preco_unitario_pedido. "</td>";
+    echo "<td data-label='Tempo de realização do pedido'>" . $tempo_pedido. "</td>";
+    echo "<td data-label='Alterar o pedido'><input id='".$id_pedido."' type='submit' onclick='alter_order(this.id)' value='Alterar pedido'></td>";
+    echo "<td data-label='Deletar o pedido'><input id='".$id_pedido."' type='button' onclick='exclude_order(this.id)' value='Excluir pedido'></td>";
 echo "</tr>";
 ?> 

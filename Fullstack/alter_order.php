@@ -42,20 +42,21 @@
         $stmt->close();
     }
     echo "<tr>";
-        echo "<td>" . $id_pedido. "</td>";
-        echo "<td>" . $nome_cliente. "</td>";
-        echo "<td>" . $produto[$_GET['produto']-1]['nome_produto']. "</td>";
-        echo "<td>" . $_GET['preco']. "</td>";
+        echo "<td data-label='ID do pedido'>" . $id_pedido. "</td>";
+        echo "<td data-label='Nome do cliente'>" . $nome_cliente. "</td>";
+        echo "<td data-label='Nome do produto'>" . $produto[$_GET['produto']-1]['nome_produto']. "</td>";
+        echo "<td data-label='Preço unitario do pedido'>" . $_GET['preco']. "</td>";
         if ($_GET['preco'] > $produto[$_GET['produto']-1]['preco_unitario_produto']){
-            echo "<td>Ôtima</td>";
+            echo "<td data-label='Rentabilidade do pedido'>Ôtima</td>";
         }elseif($_GET['preco'] >= $produto[$_GET['produto']-1]['preco_unitario_produto']*0.9){
-            echo "<td>Boa</td>";
+            echo "<td data-label='Rentabilidade do pedido'>Boa</td>";
         }else{
-            echo "<td>Ruim? Como?</td>";
+            echo "<td data-label='Rentabilidade do pedido'>Ruim? Como?</td>";
         }
-        echo "<td>" . $_GET['quantidade']. "</td>";
-        echo "<td>" . $tempo_pedido. "</td>";
-        echo "<td><input id='".$id_pedido."' type='button' onclick='alter_table(this.id)' value='Alterar pedido'></td>";
-        echo "<td><input id='".$id_pedido."' type='button' onclick='exclude_order(this.id)' value='Excluir pedido'></td>";
+        echo "<td data-label='Quantidade de produtos pedido'>" . $_GET['quantidade']. "</td>";
+        echo "<td data-label='Preço total do pedido' id='total_price".$id_pedido."'>" . $_GET['quantidade']*$_GET['preco']. "</td>";
+        echo "<td data-label='Tempo de realização do pedido'>" . $tempo_pedido. "</td>";
+        echo "<td data-label='Alterar o pedido'><input id='".$id_pedido."' type='button' onclick='alter_table(this.id)' value='Alterar pedido'></td>";
+        echo "<td data-label='Deletar o pedido'><input id='".$id_pedido."' type='button' onclick='exclude_order(this.id)' value='Excluir pedido'></td>";
     echo "</tr>";
 ?> 

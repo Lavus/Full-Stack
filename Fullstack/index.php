@@ -19,7 +19,12 @@ var type_change = "";
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            body {font-family: Arial, Helvetica, sans-serif;}
+            body {
+				font-family: "Open Sans",Arial, Helvetica, sans-serif;
+				line-height: 1.25;
+				background-color:#fafafa;
+				margin: 1.5em;
+			}
 			.pagination {
 			  display: inline-block;
 			  margin: 5px;
@@ -125,18 +130,90 @@ var type_change = "";
 			  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 			  font-size: 16px;
             }
+
+			table {
+			  margin: 0;
+			  padding: 0;
+			  width: 100%;
+			  border-collapse: collapse;
+			  border-radius: 1em;
+			  overflow: hidden;
+			}
+
+			table caption {
+			  font-size: 1.5em;
+			  margin: .25em 0 .75em;
+			}
+
+			table tr {
+			  background: #f8f8f8;
+			  padding: .35em;
+			}
+			
+			table th, table td {
+			  padding: .625em;
+			  text-align: center;
+			  padding: 1em;
+			  border-bottom: 2px solid white;
+			  border-right: 2px solid white; 
+			  border-left: 2px solid white;
+			}
+
+			table td {
+				background: #ddd;
+			}
+
+			table th {
+			  font-size: .85em;
+			  letter-spacing: .1em;
+			  text-transform: uppercase;
+			  background: #2e1e69;
+			  color: #fff;
+			}
+
+			table td img { text-align: center; }
+			@media screen and (max-width: 800px) {
+
+			table { border: 0; }
+
+			table caption { font-size: 1.3em; }
+
+			table thead { display: none; }
+
+			table tr {
+			  border-bottom: 3px solid #ddd;
+			  display: block;
+			  margin-bottom: .625em;
+			}
+
+			table td {
+			  border-bottom: 1px solid #ddd;
+			  display: block;
+			  font-size: .8em;
+			  text-align: right;
+			}
+
+			table td:before {
+			  content: attr(data-label);
+			  float: left;
+			  font-weight: bold;
+			  text-transform: uppercase;
+			}
+
+			table th, table td {
+			  padding: 1em;
+			  background: #ddd;
+			  border-bottom: 2px solid white;
+			  border-right: 2px solid white; 
+			  border-left: 2px solid white;
+			}
+
+			table td:last-child { border-bottom: 0; }
+			}
         </style>
 
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <style>
-            table, td, th {
-                border: 1px solid black;
-            }
-            td {
-                text-align:center;
-            }
-        </style>
         <script>
         $(document).ready(function(){
           $('#cadastro_pedido').submit(function(ev){
@@ -173,56 +250,63 @@ var type_change = "";
     </head>
     <body>
         <form id="cadastro_pedido" action="" method="GET">
-            <table style="width:100%;">
-                <tr>
-                    <th>Nome do cliente</th>
-                    <th>Nome do produto</th>
-                    <th>Preço unitario</th>
-                    <th>Rentabilidade do pedido</th>
-                    <th>Quantidade de produtos</th>
-                    <th>Concluir pedido</th>
-                </tr>
-                <tr>
-                    <td>                    
-                        <select id="cliente" name='cliente' required="required" onchange="showCustomer(this.value,0)">
-                            <option value="">Selecione um cliente:</option>
-                            <?php
-                                for ($contador = 0; $contador < count($cliente); $contador++) {
-                                    printf ("<option value='%d'>%s</option>", $cliente[$contador]['id_cliente'], $cliente[$contador]['nome_cliente']);
-                                }
-                            ?>
-                        </select> 
-                    </td>
-                    <td>
-                        <select id='product' name='produto' required="required" onchange="showprice(this.value,'')">
-                            <option value="">Selecione um produto:</option>
-                            <?php
-                                $contador = 0;
-                                while( $contador < count($produto)){
-                                    printf ("<option value='%d'>%s</option>", $produto[$contador]["id_produto"], $produto[$contador]["nome_produto"]);
-                                    $contador++;
-                                }
-                            ?>
-                        </select> 
-                    </td>
-                    <td>
-                        <input id="price" required="required" type="number" step=0.01 name="preco" min="0.01" value="0.01" onkeyup="showrentability(this.value,'')" onchange="showrentability(this.value,'')">
-                    </td>
-                    <td>
-                        <div id="rentabilidade">
-                            Rentabilidade ...
-                        </div>
-                    </td>
-                    <td>
-                        <input type="number" step=1 id="amount" required="required" min="1" name="quantidade" value="1">
-                    </td>
-                    <td>
-                        <input type="submit" value="Submit">
-                    </td>
-                </tr>
+            <table>
+				<thead>
+					<tr>
+						<th>Nome do cliente</th>
+						<th>Nome do produto</th>
+						<th>Preço unitario</th>
+						<th>Rentabilidade do pedido</th>
+						<th>Quantidade de produtos</th>
+						<th>Preço total do pedido</th>
+						<th>Concluir pedido</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td data-label="Nome do cliente">                    
+							<select id="cliente" name='cliente' required="required" onchange="showCustomer(this.value,0)">
+								<option value="">Selecione um cliente:</option>
+								<?php
+									for ($contador = 0; $contador < count($cliente); $contador++) {
+										printf ("<option value='%d'>%s</option>", $cliente[$contador]['id_cliente'], $cliente[$contador]['nome_cliente']);
+									}
+								?>
+							</select> 
+						</td>
+						<td data-label="Nome do produto">
+							<select id='product' name='produto' required="required" onchange="showprice(this.value,'')">
+								<option value="">Selecione um produto:</option>
+								<?php
+									$contador = 0;
+									while( $contador < count($produto)){
+										printf ("<option value='%d'>%s</option>", $produto[$contador]["id_produto"], $produto[$contador]["nome_produto"]);
+										$contador++;
+									}
+								?>
+							</select> 
+						</td>
+						<td data-label="Preço unitario">
+							<input id="price" required="required" type="number" step=0.01 name="preco" min="0.01" value="0.01" onkeyup="showrentability(this.value,'')" onchange="showrentability(this.value,'')">
+						</td>
+						<td data-label="Rentabilidade do pedido">
+							<div id="rentabilidade">
+								Rentabilidade ...
+							</div>
+						</td>
+						<td data-label="Quantidade de produtos">
+							<input type="number" step=1 id="amount" required="required" min="1" name="quantidade" value="1" onkeyup="verify_total('')" onchange="verify_total('')">
+						</td>
+						<td data-label="Preço total do pedido" id="total_price">
+							0.01
+						</td>
+						<td data-label="Concluir pedido">
+							<input type="submit" value="Submit">
+						</td>
+					</tr>
+				</tbody>
             </table> 
-        </form> 
-        <H1>preço total do pedido</H1>
+        </form>
         <!-- The Modal -->
         <div id="myModal" class="modal">
 
@@ -261,7 +345,7 @@ var type_change = "";
         </script>
 
         <form id='altera_pedido'>
-            <div id="txtHint">Informações dos pedidos do cliente selecionado serão mostradas aqui ...</div>
+			<div style='text-align: center;'><div id="txtHint"><H2>As informações dos pedidos referente ao cliente selecionado serão mostradas aqui ...</H2></div></div>
             <input type="submit" style="visibility:hidden" value="Submit">
         </form>
         <script>
@@ -346,6 +430,10 @@ var type_change = "";
 				order_id = "";
                 type_change = "";
 				modal.style.display = "none";
+			}
+			
+            function verify_total(txt) {
+				document.getElementById("total_price"+txt).innerHTML = (document.getElementById("price"+txt).value * document.getElementById("amount"+txt).value).toFixed(2);
 			}
 			
             function get_page(int) {
@@ -439,9 +527,13 @@ var type_change = "";
             }
             function showrentability(str,txt) {
                 //~ alert(txt);
-                if (str.length == 0) {
-                    document.getElementById("rentabilidade"+txt).innerHTML = "Rentabilidade do pedido serás mostrado aqui ...";
-                    return;
+                //~ alert (str);
+                //~ alert (str.length);
+                if (document.getElementById("product"+txt).value == '') {
+                    document.getElementById("rentabilidade"+txt).innerHTML = "Rentabilidade ...";
+                    verify_total(txt)
+                    //~ alert("here");
+                    return false;
                 }
                 else {
                     //~ alert (str);
@@ -467,6 +559,7 @@ var type_change = "";
                         }
                     }
                 }
+                verify_total(txt)
             }
             $("#altera_pedido").submit(function(e){
                 e.preventDefault();
