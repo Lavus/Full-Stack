@@ -209,6 +209,35 @@ var type_change = "";
 			}
 
 			table td:last-child { border-bottom: 0; }
+			
+			.modal {
+              padding-top: 40px; /* Location of the box */
+            }
+			
+			.modal-header {
+              padding: 1px 6px;
+              font-size: 10px;
+            }
+            
+			.modal-header h2 {
+              margin : 4px;
+            }
+            
+			.modal-body {
+              font-size: 8px;
+            }
+            
+            .close {
+              font-size: 22px;
+            }
+            
+			.modal-footer input {
+              margin: 5px;
+			  padding: 3px 6px;
+			  font-size: 8px;
+			  border-radius: 8px;
+            }
+			
 			}
         </style>
 
@@ -235,8 +264,8 @@ var type_change = "";
                 if (this.readyState == 4 && this.status == 200) {
                     showCustomer(document.getElementById("cliente").value,0)
 					document.getElementById("modal_title_check").innerHTML = "Cadastro Pedido";
-					document.getElementById("modal_body_check").innerHTML = "<p>O cadastro do pedido foi realizado com sucesso</p><p>obrigado por utilizar nossos serviços.</p>";
-					document.getElementById("modal_footer_check").style.visibility = "hidden";
+					document.getElementById("modal_body_check").innerHTML = "<p>O cadastro do pedido foi realizado com sucesso.</p><p>Obrigado por utilizar nossos serviços.</p>";
+					document.getElementById("modal_footer_check").style.display = "none";
 					modal.style.display = "block";
                 }
             };
@@ -307,6 +336,7 @@ var type_change = "";
 				</tbody>
             </table> 
         </form>
+        <H1>testes codigo js e php, comentarar codigo, separar codigo</H1>
         <!-- The Modal -->
         <div id="myModal" class="modal">
 
@@ -371,7 +401,7 @@ var type_change = "";
                 type_change = "alter";
                 document.getElementById("modal_title_check").innerHTML = "Alteração de pedido";
                 document.getElementById("modal_body_check").innerHTML = "<p>Tem certeza que quer alterar este pedido?</p><p></p>";
-				document.getElementById("modal_footer_check").style.visibility = "visible";
+				document.getElementById("modal_footer_check").style.display = "block";
                 document.getElementById("modal_footer_check").innerHTML = "<input type='button' value='Sim' onclick='confirmed()'><input type='button' value='Não' onclick='close_modal()'>";
                 modal.style.display = "block";
             }
@@ -379,7 +409,7 @@ var type_change = "";
 				if (document.getElementById("rentabilidade"+int).style.backgroundColor == 'red'){
 					document.getElementById("modal_title_check").innerHTML = "Rentabilidade Ruim";
 					document.getElementById("modal_body_check").innerHTML = "<p>Não é permitido atualizar pedidos se a rentabilidade estiver RUIM</p><p>por favor aumente o preço se deseja atualizar o pedido</p>";
-					document.getElementById("modal_footer_check").style.visibility = "hidden";
+					document.getElementById("modal_footer_check").style.display = "none";
 					modal.style.display = "block";
 					type_change = "verify";
 					order_id = "price"+int;
@@ -473,7 +503,7 @@ var type_change = "";
                 type_change = "exclude";
 				document.getElementById("modal_title_check").innerHTML = "Exclusão de pedido";
 				document.getElementById("modal_body_check").innerHTML = "<p>Tem certeza que quer excluir este pedido?</p><p></p>";
-				document.getElementById("modal_footer_check").style.visibility = "visible";
+				document.getElementById("modal_footer_check").style.display = "block";
 				document.getElementById("modal_footer_check").innerHTML = "<input type='button' value='Sim' onclick='confirmed()'><input type='button' value='Não' onclick='close_modal()'>";
                 modal.style.display = "block";
 			}
@@ -486,7 +516,7 @@ var type_change = "";
 						document.getElementById(id).style.visibility = "collapse";
 						document.getElementById("modal_title_check").innerHTML = "Exclusão de pedido";
 						document.getElementById("modal_body_check").innerHTML = "<p>"+this.responseText+"</p>";
-						document.getElementById("modal_footer_check").style.visibility = "hidden";
+						document.getElementById("modal_footer_check").style.display = "none";
 						modal.style.display = "block";
 						backup_inner = "";
 						backup_inner_id = "";
