@@ -22,7 +22,7 @@
 		echo "<td data-label='Nome do cliente'>" . $nome_cliente. "</td>"; # mostra a tag de criação de coluna numa linha, com uma label e informações
 		echo "<td data-label='Nome do produto'>"; # mostra a tag de criação de coluna numa linha, com uma label
 			echo "<select id='product".$id_pedido."' name='produto' required='required' onchange='showprice(this.value,".$id_pedido.")' >"; # mostra a tag de criação de um selecionador
-				$contador = 0; # cria variavel para o repetidor
+				$contador = 0; # cria a variavel para o repetidor
 				while( $contador < count($produto)){ # começa um repetidor até o contador chegar na quantidade dos produtos
 					if ($produto[$contador]["id_produto"] == $id_produto_pedido){ # verifica se o produto com numero do contador erá o anterior
 						$selected = $contador; # se for, variavel selected recebe o numero do contador atual
@@ -31,8 +31,8 @@
 					else{ # se não for, faça os comando a seguir
 						printf ("<option value='%d'>%s</option>", $produto[$contador]["id_produto"], $produto[$contador]["nome_produto"]); # cria uma opção não selecionada
 					} # fim da verificação
-					$contador++; # incrementa o contador em 1, resumindo de 1 vai para 2, 2 para 3 e ....
-				} # fim da verificação
+					$contador++; # incrementa o contador em 1, resumindo de 1 vai para 2, 2 para 3 e ...
+				} # fim do repetidor
 			echo "</select>"; # fim do selecionador
 		echo "</td>"; # fim da coluna da linha
 		echo "<td data-label='Preço unitario do pedido'><input id='price".$id_pedido."' required='required' type='number' step=0.01 name='preco' min='0.01' value='".$preco_unitario_pedido."' onkeyup='showrentability(this.value,".$id_pedido.")' onchange='showrentability(this.value,".$id_pedido.")'></td>"; # mostra a tag de criação de coluna numa linha, com uma label e informações
@@ -50,4 +50,4 @@
 		echo "<td data-label='Alterar o pedido'><input id='".$id_pedido."' type='submit' onclick='alter_order(this.id)' value='Alterar pedido'></td>"; # mostra a tag de criação de coluna numa linha, com uma label e um botão
 		echo "<td data-label='Deletar o pedido'><input id='".$id_pedido."' type='button' onclick='exclude_order(this.id)' value='Excluir pedido'></td>"; # mostra a tag de criação de coluna numa linha, com uma label e um botão
 	echo "</tr>"; # mostra a tag de fechamento de linha numa tabela
-?>   <!-- indentificação que acabou o codigo em PHP -->
+?> <!-- indentificação que acabou o codigo em PHP -->

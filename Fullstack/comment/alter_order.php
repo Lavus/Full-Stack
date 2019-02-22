@@ -3,6 +3,7 @@
     $query = "SELECT produtos.id_produto, produtos.nome_produto, produtos.preco_unitario_produto, produtos.multiplo_produto FROM produtos ORDER by produtos.id_produto";
 	# armazena a consulta ao banco de dados na variavel $query.
 	# consulta dos produtos na tabela produtos
+
     $result = $mysqli->query($query); # executa a consulta e armazena o resultado na variavel $result
     $produto = $result->fetch_all(MYSQLI_ASSOC); # pega todos os valores e armazena em $produto
 
